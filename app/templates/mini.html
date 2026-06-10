@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="crumb"><a href="/">← all topics</a></p>
+<section class="project-head">
+  <h1>{{ mini.title }}</h1>
+  {% if mini.goal %}<p class="muted">{{ mini.goal }}</p>{% endif %}
+  {% if mini.tone %}<p class="tone"><strong>Tone:</strong> {{ mini.tone }}</p>{% endif %}
+</section>
+
+<section class="form-card">
+  <h2>New take</h2>
+  <p class="muted">Paste what you wrote, or upload a recording. You'll get a coaching report
+  including <strong>what the listener actually heard</strong> vs what you meant.</p>
+  <form method="post" action="/mini/{{ mini.id }}/take" enctype="multipart/form-data">
+    <label>Language
+      <select name="language">
+        <option value="cantonese">Cantonese</option>
+        <option value="english" selected>English</option>
+        <option value="other">Other</option>
+      </select>
+    </label>
+    <label>What you MEANT to land <span class="muted">(the gap is measured against this)</span>
+      <textarea name="intended_message" rows="2" placeholder="In one sentence, the point you wanted to get across."></textarea>
+    </label>
+    <label>Your take (text)
+      <textarea name="source_text" rows="6" placeholder="Paste your written / spoken-out take here..."></textarea>
+    </label>
+    <label>...or upload audio <span class="muted">(transcribed locally on the Mac mini)</span>
+      <input type="file" name="audio" accept="audio/*">
+    </label>
+    <button type="submit">Submit take →</button>
+  </form>
+</section>
+
+<section>
+  <h2>Takes</h2>
+  {% if takes %}
+  <ul class="cards">
+    {% for t in takes %}
+    <li><a href="/take/{{ t.id }}">
+      <span class="card-title">Take #{{ t.id }} · {{ t.language }} · {{ t.kind }}</span>
+      <span class="badge badge-{{ t.status }}">{{ t.status }}</span>
+      {% if t.intended_message %}<span class="card-sub">meant: {{ t.intended_message }}</span>{% endif %}
+    </a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No takes yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

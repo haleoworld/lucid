@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="crumb"><a href="/mini/{{ mini.id }}">← {{ mini.title }}</a></p>
+<section class="project-head">
+  <h1>Take #{{ take.id }}</h1>
+  <p class="muted">{{ take.language }} · {{ take.kind }} ·
+    <span class="badge badge-{{ take.status }}" id="status-badge">{{ take.status }}</span></p>
+  {% if take.intended_message %}
+  <p class="intended"><strong>What you meant:</strong> {{ take.intended_message }}</p>
+  {% endif %}
+</section>
+
+{% if take.status in ('queued', 'processing') %}
+<div class="warn" id="processing-note">⏳ Processing… this page will refresh automatically.</div>
+<script>
+  (function () {
+    var poll = setInterval(function () {
+      fetch('/take/{{ take.id }}/status').then(function (r) { return r.json(); }).then(function (d) {
+        if (d.status === 'done' || d.status === 'failed') { clearInterval(poll); location.reload(); }
+      });
+    }, 2500);
+  })();
+</script>
+{% endif %}
+
+{% if take.status == 'failed' %}
+<div class="error">❌ Failed: {{ take.error }}</div>
+{% endif %}
+
+{% if report %}
+<section class="report-card gap">
+  <h2>What landed</h2>
+  <p class="heard"><strong>Heard:</strong> {{ report.heard_message }}</p>
+  <p class="gap-note">{{ report.gap_note }}</p>
+</section>
+
+<section class="report-card">
+  <h2>Overall</h2>
+  <p>{{ report.overall_summary }}</p>
+</section>
+
+<section class="report-card">
+  <h2>Clarity scores</h2>
+  <ul class="scores">
+    {% for key, label in [('lead','Lead'),('through_line','Through-line'),('order','Order'),('signposting','Signposting'),('landing','Landing')] %}
+    {% set s = report.clarity_scores[key] %}
+    <li>
+      <span class="score-label">{{ label }}</span>
+      <span class="score-pips">{% for i in range(1,6) %}<span class="pip {{ 'on' if i <= s.score else '' }}"></span>{% endfor %}</span>
+      <span class="score-note">{{ s.note }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% if report.what_worked %}
+<section class="report-card good">
+  <h2>What worked</h2>
+  {% for w in report.what_worked %}
+  <div class="item"><blockquote>{{ w.quote }}</blockquote><p>{{ w.why }}</p></div>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% if report.top_patterns %}
+<section class="report-card amber">
+  <h2>Patterns to fix</h2>
+  {% for p in report.top_patterns %}
+  <div class="item">
+    <h3>{{ p.name }}</h3>
+    {% for ex in p.examples %}<blockquote>{{ ex }}</blockquote>{% endfor %}
+    <p><strong>Fix:</strong> {{ p.fix }}</p>
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+<section class="report-card next">
+  <h2>Practice this next</h2>
+  <p>{{ report.next_rep }}</p>
+</section>
+{% endif %}
+
+{% if transcript %}
+<section class="report-card">
+  <h2>Transcript</h2>
+  {% if transcript.metrics %}
+  <p class="metrics">
+    {{ transcript.metrics.word_count }} words ·
+    {{ transcript.metrics.filler_count }} fillers ({{ (transcript.metrics.filler_rate * 100) | round(1) }}%) ·
+    avg sentence {{ transcript.metrics.avg_sentence_len }} words
+    {% if transcript.metrics.wpm %} · {{ transcript.metrics.wpm }} wpm{% endif %}
+  </p>
+  {% endif %}
+  <div class="transcript">{{ transcript.text }}</div>
+</section>
+{% endif %}
+{% endblock %}

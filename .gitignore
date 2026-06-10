@@ -1,0 +1,32 @@
+# --- SECRETS & PRIVATE DATA: never commit ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets/
+
+# All user data: recordings, transcripts, coaching reports, the database
+data/
+*.db
+*.sqlite
+*.sqlite3
+*.wav
+*.mp3
+*.m4a
+*.aac
+*.ogg
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
