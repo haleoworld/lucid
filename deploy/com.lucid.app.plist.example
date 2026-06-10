@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  launchd agent template to keep Lucid running on a Mac (survives reboot/login).
+  Install:
+    1. Edit the absolute paths below to match your checkout.
+    2. cp deploy/com.lucid.app.plist.example ~/Library/LaunchAgents/com.lucid.app.plist
+    3. launchctl load -w ~/Library/LaunchAgents/com.lucid.app.plist
+  The Tailscale subpath (`tailscale serve --bg --set-path /lucid http://127.0.0.1:8042`)
+  persists separately and is not managed here.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.lucid.app</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/ABSOLUTE/PATH/TO/Lucid/venv/bin/uvicorn</string>
+        <string>app.main:app</string>
+        <string>--host</string><string>0.0.0.0</string>
+        <string>--port</string><string>8042</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/ABSOLUTE/PATH/TO/Lucid</string>
+    <key>RunAtLoad</key><true/>
+    <key>KeepAlive</key><true/>
+    <key>StandardOutPath</key>
+    <string>/ABSOLUTE/PATH/TO/Lucid/data/lucid.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/ABSOLUTE/PATH/TO/Lucid/data/lucid.err.log</string>
+</dict>
+</plist>

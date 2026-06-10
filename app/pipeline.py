@@ -8,7 +8,12 @@ Mirrors elevator's _run_pipeline, stripped of interview-specific stages
 """
 from __future__ import annotations
 
-from . import coaching, db, metrics, transcribe
+from . import coaching, config, db, metrics, notify, transcribe
+
+
+def _take_url(take_id: int) -> str:
+    base = config.PUBLIC_URL.rstrip("/") if config.PUBLIC_URL else ""
+    return f"{base}{config.URL_PREFIX}/take/{take_id}" if base else ""
 
 
 def run(take_id: int) -> None:
@@ -47,5 +52,8 @@ def run(take_id: int) -> None:
         )
         db.save_report(take_id, report)
         db.set_take_status(take_id, "done")
+        heard = report.get("heard_message", "")
+        notify.send(f"✅ Lucid · take #{take_id} report ready\nHeard: {heard}\n{_take_url(take_id)}".strip())
     except Exception as exc:  # noqa: BLE001
         db.set_take_status(take_id, "failed", str(exc))
+        notify.send(f"❌ Lucid · take #{take_id} failed: {exc}\n{_take_url(take_id)}".strip())

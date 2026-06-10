@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<p class="crumb"><a href="/mini/{{ mini.id }}">← {{ mini.title }}</a></p>
+<p class="crumb"><a href="{{ prefix }}/mini/{{ mini.id }}">← {{ mini.title }}</a></p>
 <section class="project-head">
   <h1>Take #{{ take.id }}</h1>
   <p class="muted">{{ take.language }} · {{ take.kind }} ·
@@ -15,7 +15,7 @@
 <script>
   (function () {
     var poll = setInterval(function () {
-      fetch('/take/{{ take.id }}/status').then(function (r) { return r.json(); }).then(function (d) {
+      fetch('{{ prefix }}/take/{{ take.id }}/status').then(function (r) { return r.json(); }).then(function (d) {
         if (d.status === 'done' || d.status === 'failed') { clearInterval(poll); location.reload(); }
       });
     }, 2500);

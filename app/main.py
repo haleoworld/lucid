@@ -33,35 +33,43 @@ def _current_project() -> dict:
     return projects[0]  # single global project for now
 
 
+def render(request: Request, name: str, **ctx):
+    """Render a template, always injecting request + URL prefix."""
+    ctx["request"] = request
+    ctx["prefix"] = config.URL_PREFIX
+    return templates.TemplateResponse(name, ctx)
+
+
+def redirect(path: str) -> RedirectResponse:
+    """303 redirect to an app path, prefixed for the subpath mount."""
+    return RedirectResponse(config.URL_PREFIX + path, status_code=303)
+
+
 # --- pages ------------------------------------------------------------------
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     project = _current_project()
     minis = db.list_mini_projects(project["id"])
-    return templates.TemplateResponse("index.html", {
-        "request": request, "project": project, "minis": minis,
-        "has_key": config.has_api_key(),
-    })
+    return render(request, "index.html", project=project, minis=minis,
+                  has_key=config.has_api_key())
 
 
 @app.post("/mini")
 def create_mini(title: str = Form(...), goal: str = Form(""), tone: str = Form("")):
     project = _current_project()
     mid = db.create_mini_project(project["id"], title.strip(), goal.strip(), tone.strip())
-    return RedirectResponse(f"/mini/{mid}", status_code=303)
+    return redirect(f"/mini/{mid}")
 
 
 @app.get("/mini/{mid}", response_class=HTMLResponse)
 def mini_detail(request: Request, mid: int):
     mini = db.get_mini_project(mid)
     if not mini:
-        return RedirectResponse("/", status_code=303)
+        return redirect("/")
     takes = db.list_takes(mid)
-    return templates.TemplateResponse("mini.html", {
-        "request": request, "mini": mini, "takes": takes,
-        "has_key": config.has_api_key(),
-    })
+    return render(request, "mini.html", mini=mini, takes=takes,
+                  has_key=config.has_api_key())
 
 
 @app.post("/mini/{mid}/take")
@@ -72,7 +80,7 @@ def create_take(mid: int,
                 audio: Optional[UploadFile] = File(None)):
     mini = db.get_mini_project(mid)
     if not mini:
-        return RedirectResponse("/", status_code=303)
+        return redirect("/")
 
     audio_path = ""
     kind = "text"
@@ -89,21 +97,19 @@ def create_take(mid: int,
         source_text=source_text.strip(), audio_path=audio_path,
     )
     worker.enqueue(take_id)
-    return RedirectResponse(f"/take/{take_id}", status_code=303)
+    return redirect(f"/take/{take_id}")
 
 
 @app.get("/take/{take_id}", response_class=HTMLResponse)
 def take_detail(request: Request, take_id: int):
     take = db.get_take(take_id)
     if not take:
-        return RedirectResponse("/", status_code=303)
+        return redirect("/")
     mini = db.get_mini_project(take["mini_project_id"])
     transcript = db.get_transcript(take_id)
     report = db.get_report(take_id)
-    return templates.TemplateResponse("take.html", {
-        "request": request, "take": take, "mini": mini,
-        "transcript": transcript, "report": report,
-    })
+    return render(request, "take.html", take=take, mini=mini,
+                  transcript=transcript, report=report)
 
 
 @app.get("/take/{take_id}/status")

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start the Learning Coach web app, reachable over Tailscale.
+# Start the Lucid web app, reachable over Tailscale.
 set -euo pipefail
 cd "$(dirname "$0")"
 

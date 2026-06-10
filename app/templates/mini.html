@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<p class="crumb"><a href="/">← all topics</a></p>
+<p class="crumb"><a href="{{ prefix }}/">← all topics</a></p>
 <section class="project-head">
   <h1>{{ mini.title }}</h1>
   {% if mini.goal %}<p class="muted">{{ mini.goal }}</p>{% endif %}
@@ -11,7 +11,7 @@
   <h2>New take</h2>
   <p class="muted">Paste what you wrote, or upload a recording. You'll get a coaching report
   including <strong>what the listener actually heard</strong> vs what you meant.</p>
-  <form method="post" action="/mini/{{ mini.id }}/take" enctype="multipart/form-data">
+  <form method="post" action="{{ prefix }}/mini/{{ mini.id }}/take" enctype="multipart/form-data">
     <label>Language
       <select name="language">
         <option value="cantonese">Cantonese</option>
@@ -37,7 +37,7 @@
   {% if takes %}
   <ul class="cards">
     {% for t in takes %}
-    <li><a href="/take/{{ t.id }}">
+    <li><a href="{{ prefix }}/take/{{ t.id }}">
       <span class="card-title">Take #{{ t.id }} · {{ t.language }} · {{ t.kind }}</span>
       <span class="badge badge-{{ t.status }}">{{ t.status }}</span>
       {% if t.intended_message %}<span class="card-sub">meant: {{ t.intended_message }}</span>{% endif %}
