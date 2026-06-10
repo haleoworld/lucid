@@ -3,8 +3,40 @@
 <p class="crumb"><a href="{{ prefix }}/">← all topics</a></p>
 <section class="project-head">
   <h1>{{ mini.title }}</h1>
-  {% if mini.goal %}<p class="muted">{{ mini.goal }}</p>{% endif %}
-  {% if mini.tone %}<p class="tone"><strong>Tone:</strong> {{ mini.tone }}</p>{% endif %}
+  <p class="muted"><span class="badge">{{ mini.domain }}</span></p>
+  {% if mini.situation %}<p class="muted"><strong>Situation:</strong> {{ mini.situation }}</p>{% endif %}
+  {% if mini.goal %}<p class="muted"><strong>Goal:</strong> {{ mini.goal }}</p>{% endif %}
+  {% if mini.tone %}<p class="tone"><strong>Target tone:</strong> {{ mini.tone }}</p>{% endif %}
+</section>
+
+<section class="report-card next">
+  <div class="prep-head">
+    <h2>📚 Prep</h2>
+    <form method="post" action="{{ prefix }}/mini/{{ mini.id }}/prep">
+      <button type="submit" class="small">{{ 'Regenerate' if mini.prep else 'Generate prep' }}</button>
+    </form>
+  </div>
+  {% if mini.prep and mini.prep.error %}
+    <div class="error">Prep failed: {{ mini.prep.error }}</div>
+  {% elif mini.prep %}
+    {% set p = mini.prep %}
+    <p>{{ p.summary }}</p>
+
+    {% if p.how_to_improve %}<h3>How to improve</h3><ul>{% for t in p.how_to_improve %}<li>{{ t }}</li>{% endfor %}</ul>{% endif %}
+
+    {% if p.sources %}<h3>Sources</h3><ul class="sources">
+      {% for s in p.sources %}<li><a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.title }}</a>
+      {% if s.kind %}<span class="muted"> · {{ s.kind }}</span>{% endif %}{% if s.why %}<br><span class="muted">{{ s.why }}</span>{% endif %}</li>{% endfor %}
+    </ul>{% endif %}
+
+    {% if p.key_points %}<h3>Key points</h3><ul>{% for k in p.key_points %}<li>{{ k }}</li>{% endfor %}</ul>{% endif %}
+    {% if p.suggested_throughline %}<h3>Suggested through-line</h3><p>{{ p.suggested_throughline }}</p>{% endif %}
+    {% if p.outline %}<h3>Outline</h3><ol>{% for o in p.outline %}<li>{{ o }}</li>{% endfor %}</ol>{% endif %}
+    {% if p.example_phrasings %}<h3>Example phrasings (target tone)</h3><ul>{% for e in p.example_phrasings %}<li><em>"{{ e }}"</em></li>{% endfor %}</ul>{% endif %}
+    {% if p.pitfalls %}<h3>Pitfalls to avoid</h3><ul>{% for pf in p.pitfalls %}<li>{{ pf }}</li>{% endfor %}</ul>{% endif %}
+  {% else %}
+    <p class="muted">Generate a prep brief — cited sources (YouTube/articles), key points, a through-line, an outline, and example phrasings tuned to your target tone. Takes up to a minute or two (it searches the web).</p>
+  {% endif %}
 </section>
 
 <section class="form-card">

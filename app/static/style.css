@@ -73,3 +73,11 @@ blockquote { margin: 6px 0; padding: 8px 12px; border-left: 3px solid var(--line
 .item { margin: 12px 0; }
 .metrics { font-size: .85rem; color: var(--muted); }
 .transcript { white-space: pre-wrap; background: var(--card2); border-radius: 8px; padding: 12px; }
+
+.domain-head { text-transform: capitalize; color: var(--muted); margin: 18px 0 8px; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+.prep-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.prep-head form { margin: 0; }
+button.small { padding: 7px 12px; font-size: .85rem; }
+.report-card h3 { color: var(--accent); }
+ul.sources li { margin: 8px 0; }
+ul.sources a { color: var(--accent); }

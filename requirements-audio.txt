@@ -1,0 +1,4 @@
+# Optional audio transcription (Apple Silicon only). Also needs ffmpeg:
+#   brew install ffmpeg
+# Install with:  pip install -r requirements-audio.txt
+mlx-whisper==0.4.3

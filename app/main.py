@@ -10,7 +10,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from . import config, db, worker
+from . import coaching, config, db, worker
 
 BASE = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE / "templates"))
@@ -56,9 +56,27 @@ def home(request: Request):
 
 
 @app.post("/mini")
-def create_mini(title: str = Form(...), goal: str = Form(""), tone: str = Form("")):
+def create_mini(title: str = Form(...), domain: str = Form("learning"),
+                situation: str = Form(""), goal: str = Form(""), tone: str = Form("")):
     project = _current_project()
-    mid = db.create_mini_project(project["id"], title.strip(), goal.strip(), tone.strip())
+    mid = db.create_mini_project(
+        project["id"], title.strip(), goal=goal.strip(), tone=tone.strip(),
+        domain=domain.strip() or "learning", situation=situation.strip())
+    return redirect(f"/mini/{mid}")
+
+
+@app.post("/mini/{mid}/prep")
+def generate_prep(mid: int):
+    mini = db.get_mini_project(mid)
+    if not mini:
+        return redirect("/")
+    try:
+        brief = coaching.prep(
+            title=mini["title"], domain=mini["domain"], situation=mini["situation"],
+            goal=mini["goal"], tone=mini["tone"])
+        db.save_prep(mid, brief)
+    except Exception as exc:  # noqa: BLE001
+        db.save_prep(mid, {"error": str(exc)})
     return redirect(f"/mini/{mid}")
 
 

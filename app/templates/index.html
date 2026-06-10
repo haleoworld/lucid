@@ -13,26 +13,39 @@
 <section>
   <h2>Topics</h2>
   {% if minis %}
-  <ul class="cards">
-    {% for m in minis %}
-    <li><a href="{{ prefix }}/mini/{{ m.id }}">
-      <span class="card-title">{{ m.title }}</span>
-      <span class="muted">{{ m.take_count }} take{{ '' if m.take_count == 1 else 's' }}</span>
-      {% if m.goal %}<span class="card-sub">{{ m.goal }}</span>{% endif %}
-    </a></li>
+    {% for domain, items in minis|groupby('domain') %}
+    <h3 class="domain-head">{{ domain|capitalize }}</h3>
+    <ul class="cards">
+      {% for m in items %}
+      <li><a href="{{ prefix }}/mini/{{ m.id }}">
+        <span class="card-title">{{ m.title }}</span>
+        <span class="muted">{{ m.take_count }} take{{ '' if m.take_count == 1 else 's' }}{% if m.prep_json %} · prepped 📚{% endif %}</span>
+        {% if m.situation %}<span class="card-sub">{{ m.situation }}</span>{% endif %}
+      </a></li>
+      {% endfor %}
+    </ul>
     {% endfor %}
-  </ul>
   {% else %}
-  <p class="muted">No topics yet. Add one below to start a learn → articulate → practice loop.</p>
+  <p class="muted">No topics yet. Add one below to start a learn → prep → articulate → practice loop.</p>
   {% endif %}
 </section>
 
 <section class="form-card">
   <h2>New topic</h2>
   <form method="post" action="{{ prefix }}/mini">
-    <label>Title<input name="title" required placeholder="e.g. Explaining the queue concurrency fix"></label>
-    <label>Goal <span class="muted">(what should land?)</span><textarea name="goal" rows="2" placeholder="What's the one message a listener should walk away with?"></textarea></label>
-    <label>Tone <span class="muted">(optional — inherits project tone)</span><input name="tone" placeholder="e.g. crisp, confident, no jargon"></label>
+    <label>Title<input name="title" required placeholder="e.g. Defuse my wife's tiredness with humour"></label>
+    <label>Domain
+      <select name="domain">
+        <option value="work">Work</option>
+        <option value="relationship">Relationship</option>
+        <option value="social">Social</option>
+        <option value="sales">Sales</option>
+        <option value="learning" selected>Learning</option>
+      </select>
+    </label>
+    <label>Situation <span class="muted">(the scenario you're practicing)</span><textarea name="situation" rows="2" placeholder="Describe the moment: who's there, what's happening, what makes it hard."></textarea></label>
+    <label>Goal <span class="muted">(what should land?)</span><textarea name="goal" rows="2" placeholder="What outcome / impression do you want?"></textarea></label>
+    <label>Target tone <span class="muted">(your envisioned self)</span><input name="tone" placeholder="e.g. warm, witty, calm authority"></label>
     <button type="submit">Create topic</button>
   </form>
 </section>

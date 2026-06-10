@@ -12,13 +12,18 @@ research/summarize tutor stages come next.
 
 ## How it works
 
-- **Projects** carry a global goal + tone. Under them, **topics** (mini-projects) each
-  have their own goal/tone.
-- A **take** is one attempt at articulating an idea — pasted text now, or audio
-  (transcribed locally) soon.
-- Each take gets a **coaching report**: the *heard-vs-meant* gap, a structure/clarity
-  rubric (lead, through-line, order, signposting, landing), what worked, patterns to
-  fix, and a next-rep suggestion.
+- **Projects** carry a global goal + tone. Under them, **topics** (mini-projects) are
+  the things you practice — each with a domain (work / relationship / social / sales /
+  learning), a situation, a goal, and a **target tone** (your envisioned self).
+- **Prep** (tutor stage): generate a study brief for a topic — how to improve, **cited
+  sources from a live web search** (YouTube videos, articles), key points, a suggested
+  through-line, an outline, example phrasings in your target tone, and pitfalls.
+- A **take** is one attempt — pasted text or **audio (transcribed locally via
+  mlx-whisper)**.
+- Each take gets a **coaching report**: the *heard-vs-meant* gap, plus a **dynamic
+  rubric** whose dimensions are chosen to fit the scenario (a demo is scored on
+  structure; "calm my kid without lecturing" on tone-match, warmth, and landing without
+  resistance), what worked, patterns to fix, and a next rep. Telegram pings on done/fail.
 
 ## Privacy
 
@@ -34,8 +39,11 @@ cp .env.example .env        # then put your ANTHROPIC_API_KEY in .env
 ./run.sh
 ```
 
-Binds to `0.0.0.0:8000` so it's reachable over **Tailscale** — open
-`http://<your-mac-mini-tailscale-ip>:8000` from your phone.
+Binds to `0.0.0.0:8042` so it's reachable over **Tailscale**. For a tidy HTTPS path:
+`tailscale serve --bg --set-path /lucid http://127.0.0.1:8042` (set `URL_PREFIX=/lucid`).
+For always-on across reboots, see `deploy/com.lucid.app.plist.example`.
+Audio transcription is optional (Apple Silicon): `pip install -r requirements-audio.txt`
+plus `brew install ffmpeg`.
 
 ## Stack
 

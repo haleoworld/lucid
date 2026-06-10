@@ -41,8 +41,11 @@ CREATE TABLE IF NOT EXISTS mini_projects (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     project_id  INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     title       TEXT NOT NULL,
-    goal        TEXT NOT NULL DEFAULT '',
-    tone        TEXT NOT NULL DEFAULT '',
+    domain      TEXT NOT NULL DEFAULT 'learning',  -- work|relationship|social|sales|learning
+    situation   TEXT NOT NULL DEFAULT '',          -- the scenario / context to practice
+    goal        TEXT NOT NULL DEFAULT '',          -- what should land
+    tone        TEXT NOT NULL DEFAULT '',          -- envisioned-self tone target
+    prep_json   TEXT NOT NULL DEFAULT '',          -- cached AI prep brief
     status      TEXT NOT NULL DEFAULT 'active',
     created_at  REAL NOT NULL
 );
@@ -124,16 +127,27 @@ def get_project(pid: int) -> Optional[Dict[str, Any]]:
 
 # --- mini projects ----------------------------------------------------------
 
-def create_mini_project(project_id: int, title: str, goal: str, tone: str) -> int:
+def create_mini_project(project_id: int, title: str, goal: str = "", tone: str = "",
+                        domain: str = "learning", situation: str = "") -> int:
     conn = _conn()
     try:
         cur = conn.execute(
-            "INSERT INTO mini_projects (project_id, title, goal, tone, created_at) "
-            "VALUES (?,?,?,?,?)",
-            (project_id, title, goal, tone, time.time()),
+            "INSERT INTO mini_projects (project_id, title, domain, situation, goal, "
+            "tone, created_at) VALUES (?,?,?,?,?,?,?)",
+            (project_id, title, domain, situation, goal, tone, time.time()),
         )
         conn.commit()
         return cur.lastrowid
+    finally:
+        conn.close()
+
+
+def save_prep(mid: int, prep: Dict[str, Any]) -> None:
+    conn = _conn()
+    try:
+        conn.execute("UPDATE mini_projects SET prep_json=? WHERE id=?",
+                     (json.dumps(prep), mid))
+        conn.commit()
     finally:
         conn.close()
 
@@ -156,7 +170,11 @@ def get_mini_project(mid: int) -> Optional[Dict[str, Any]]:
     conn = _conn()
     try:
         r = conn.execute("SELECT * FROM mini_projects WHERE id=?", (mid,)).fetchone()
-        return dict(r) if r else None
+        if not r:
+            return None
+        d = dict(r)
+        d["prep"] = json.loads(d.get("prep_json") or "null")
+        return d
     finally:
         conn.close()
 

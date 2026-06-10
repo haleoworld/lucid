@@ -43,6 +43,9 @@ def run(take_id: int) -> None:
 
         report = coaching.synthesize(
             text, m,
+            title=mini.get("title", ""),
+            domain=mini.get("domain", "learning"),
+            situation=mini.get("situation", ""),
             project_goal=project.get("goal", ""),
             project_tone=project.get("tone", ""),
             mini_goal=mini.get("goal", ""),
