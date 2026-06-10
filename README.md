@@ -1,10 +1,10 @@
-# Learning Coach
+# Lucid
 
 A personal, AI-assisted learning companion. You pick something you want to learn,
 work it down to a clear point, then **practice articulating it** — and the app tells
 you *what a listener actually heard* versus what you meant. The goal: close the gap
 between what you know and what comes across, and practice sounding like the person
-you want to become.
+you envision becoming.
 
 The loop: **learn → research → analyze → summarize → record & articulate → practice → repeat.**
 This first version implements the **articulate → coach → practice** spine; the

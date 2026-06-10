@@ -15,7 +15,7 @@ from . import config, db, worker
 BASE = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE / "templates"))
 
-app = FastAPI(title="Learning Coach")
+app = FastAPI(title="Lucid")
 app.mount("/static", StaticFiles(directory=str(BASE / "static")), name="static")
 
 
